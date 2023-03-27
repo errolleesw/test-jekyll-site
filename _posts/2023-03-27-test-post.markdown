@@ -1,0 +1,44 @@
+---
+layout: post
+title:  "What is Oauth"
+date:   2023-03-27 11:17:36 +1100
+categories: jekyll update
+---
+## Introduction
+So recently I found myself getting frustrated at my team for not being to explain what they were trying to do clearly. We found ourselves going around in circles, getting confused with the definition of terms and concepts. After about 2 hours of debate and me asking some very simple questions, I realised that I didn't understand the foundational concepts of what we were discussing and this was part of the problem. We were attempting to design user experience to allow our customers to register an a new integration on our platform. Specifically using the OAuth2 framework. While I have heard of this term "OAuth" before, I actually didn't have any idea how it worked. This led to this article.
+
+## What Exactly is OAuth?
+Have you come across this screen before? Notice how you don't actually need a unique login to Spotify and how you can use your user credentials from Facebook, Apple or Google? This is made possible through OAuth.
+!["Spotify Login"](/assets/test_image.png){:class="img-responsive"}
+Given how simple this login process is, one might think that OAuth is a service or an API provided by a third party. This would be incorrect. OAuth is actually an open standard, a framework, a set of guidelines that anyone can use and implement [[What the Heck Is OAuth#^c9ebe3]]. It is a standard used to provide client applications with **secure delegated access**. In this example, Spotify has implemented their version of the OAuth framework to make this possible.
+
+There are two versions of OAuth: OAuth 1.0a and OAuth 2.0. They are completely different from one another and can't be used together. Most modern applications use OAuth 2.0 and all references to OAuth in this article are to OAuth 2.0 [[What the Heck Is OAuth#^923eb1]].
+
+### What is Secure Delegated Access? Client? Application?
+To understand this, we need to understand all the players in this workflow. There are 3:
+1. The Application (i.e. Spotify)
+2. The Server (i.e. Facebook)
+	1. Authorisation Server: A server used to securely authenticate a user (e.g. username and password)
+	2. Resource Server: A server used to store data and content related to the user (e.g. profile picture, posts etc.)
+3. The User (i.e. the person trying to login Spotify with their facebook credentials)
+
+### So what Actually Happens when You Click *continue with Facebook*?
+This process starts with the **User**. Let's call her Sarah. Sarah navigates to spotify.com and clicks **continue with facebook**.
+#### Step 1: App Requests Authorisation from User
+- Spotify (the application) makes a request to Facebook (the server) which will then display an authorisation screen.
+![[Pasted image 20230204090136.png]]
+#### Step 2: User Authorises App and Delivers Proof
+- Once Sarah enters her credentials and successfully logs in. There is typcially a prompt which let's Sarah know the information from her Facebook account she is giving Spotify permissions access to. In the screenshot below, this information can be found in the **learn more** hyperlink. The information in this example probably includes the facebook profile picture and friends list.
+![[Pasted image 20230204090256.png]]
+* When accepted, Facebook will provide Spotify with a unique access token for Sarah's login. Spotify will use this token from this point to make requests to the Facebook servers for information.
+* You can think of this access token as the hotel key card (but for apps). [[What the Heck Is OAuth#^2f1ecd]]
+#### Step 3: App Uses Token to Access User Authorised Information
+* It is the job of Authorisation server to validate the access token. If valid, Spotify will then be able to access the Sarah's Facebook information from the Facebook Resource server.
+
+### What is This Clever?
+In addition to helping Sarah remember one less username and password. The OAuth standard is also super clever because **at no point in the process above is Sarah providing her Facebook username and password to Spotify**. It solves the delegated authorisation problem which can be summarised as this question: 'How can I allow an app to access my data without necessarily giving it my password? [[What the Heck Is OAuth#^16e0d6]]'.
+
+## Conclusion
+Now to finally bring this back to the problem I was trying to solve with the team. In order to facilitate step 1 in the above process, Spotify needs to know where to send the user authorisation request. Facebook has provided Spotify with a unique set of connection details stored securely within the Spotify application. When Sarah clicks the **continue with facebook** button in Step 1, spotify uses these connection details so that the right authorisation page is surfced. Similar connection details are stored to login with Apple and Google.
+
+For myself and the team, we needed to come up with a solution to allow our customers (enterprise IT teams) to configure the connection details of the external servers we want our application to integrate with so that users can use the OAuth framework to provide delegated access to the information.
